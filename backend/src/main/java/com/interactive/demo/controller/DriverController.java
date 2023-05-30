@@ -1,40 +1,41 @@
 package com.interactive.demo.controller;
 
-import com.interactive.demo.model.Car;
-import com.interactive.demo.model.Driver;
+import com.interactive.demo.dtos.DriverDTO;
 import com.interactive.demo.services.DriverService;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import java.util.Map;
 
 @RestController
-@RequestMapping ("/driver")
+@RequestMapping("api/v1/drivers")
 public class DriverController {
-    @Autowired
-    private DriverService driverService;
+    private final DriverService driverService;
 
-    @PostMapping("")
-    public ResponseEntity add(@RequestBody final @NotNull Driver driver) {
+    public DriverController(DriverService driverService) {
+        this.driverService = driverService;
+    }
+
+    @PostMapping
+    public ResponseEntity<DriverDTO> add(@RequestBody final @NotNull DriverDTO driver) {
         return driverService.add(driver);
     }
 
 
-    @GetMapping("")
-    public List<Driver> getAll(){
+    @GetMapping
+    public ResponseEntity<List<DriverDTO>> getAll() {
         return driverService.getAll();
     }
 
-    @PostMapping("/{id}/update")
-    public ResponseEntity update (@PathVariable final @NotNull Integer id, @RequestBody final @NotNull  Driver driver){
-        return driverService.update(id,driver);
+    @PutMapping("{driverId}")
+    public ResponseEntity<DriverDTO> update(@PathVariable(value = "driverId") final @NotNull Integer id, @RequestBody final @NotNull DriverDTO driver) {
+        return driverService.update(id, driver);
     }
 
-    @PostMapping ("/{id}/delete")
-    public ResponseEntity delete( @PathVariable Integer id){
+    @DeleteMapping("{driverId}")
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable(value = "driverId") Integer id) {
         return driverService.delete(id);
     }
 }

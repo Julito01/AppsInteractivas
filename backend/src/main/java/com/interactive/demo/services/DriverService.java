@@ -1,70 +1,77 @@
 package com.interactive.demo.services;
 
 
+import com.interactive.demo.dtos.DriverDTO;
+import com.interactive.demo.exception.ApiRequestException;
 import com.interactive.demo.model.Driver;
 import com.interactive.demo.repository.DriverRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 public class DriverService {
-
     private final DriverRepository driverRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    public DriverService(DriverRepository repository) {
+    public DriverService(DriverRepository repository, ModelMapper modelMapper) {
         this.driverRepository = repository;
+        this.modelMapper = modelMapper;
     }
 
-    // Create
-    public ResponseEntity add(Driver driver) {
+    public ResponseEntity<DriverDTO> add(DriverDTO driverDTO) {
+        Driver driver = this.modelMapper.map(driverDTO, Driver.class);
+        Driver createdDriver = driverRepository.save(driver);
 
-        try{
-            driverRepository.save(driver);
-            return ResponseEntity.status(CREATED).build();
-        }
-        catch (Exception e){
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
-        }
-
-    }
-    // Read
-    public List<Driver> getAll() {
-        return driverRepository.findAll();
+        return ResponseEntity.status(CREATED).body(this.modelMapper.map(createdDriver, DriverDTO.class));
     }
 
-    // Update
-    public ResponseEntity update(Integer id,Driver driver) {
-        try {
-            Driver driverTemporaly = driverRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST,"Driver not found"));
-            driverTemporaly.setName(driver.getName());
-            driverRepository.save(driverTemporaly);
-            return ResponseEntity.status(OK).build();
+    public ResponseEntity<List<DriverDTO>> getAll() {
+        List<DriverDTO> driverDTOS = new ArrayList<>();
+
+        for (Driver driver : this.driverRepository.findAll()) {
+            driverDTOS.add(this.modelMapper.map(driver, DriverDTO.class));
         }
-        catch (Exception e){
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
-        }
+
+        return ResponseEntity.ok(driverDTOS);
     }
 
-    // Delete
+    public ResponseEntity<DriverDTO> update(Integer driverId, DriverDTO driverDTO) {
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(
+                        () -> new ApiRequestException(
+                                String.format("Piloto con id [%s] no encontrado", driverId),
+                                NOT_FOUND
+                        ));
 
-    public ResponseEntity delete(Integer id){
-        try {
-            driverRepository.deleteById(id);
-            return ResponseEntity.status(OK).build();
-        }
-        catch (Exception e){
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
-        }
+        driver.setName(driverDTO.getName());
+        Driver updatedDriver = driverRepository.save(driver);
+
+        return ResponseEntity.ok(this.modelMapper.map(updatedDriver, DriverDTO.class));
     }
 
+    public ResponseEntity<Map<String, Object>> delete(Integer driverId) {
+        Driver driver = this.driverRepository.findById(driverId)
+                .orElseThrow(
+                        () -> new ApiRequestException(
+                                String.format("Piloto con id [%s] no encontrado", driverId),
+                                NOT_FOUND
+                        )
+                );
 
+        this.driverRepository.delete(driver);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", true);
+        response.put("message", "Piloto con id [%s] eliminado");
+
+        return ResponseEntity.ok(response);
+    }
 }

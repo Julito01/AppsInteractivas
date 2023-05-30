@@ -4,19 +4,17 @@ package com.interactive.demo.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Driver {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
     private String name;
-
-    public Driver(){
-
-    }
 
     @ManyToOne
     @JoinColumn(name = "car_id")
@@ -29,5 +27,4 @@ public class Driver {
     @JoinTable( name = "driver", JoinColumn(name = "id_b"), InverseJoinColumns = @JoinColumn(name = "id_a"))
     private List<Auto> autoList;
      */
-
 }
