@@ -1,0 +1,42 @@
+
+<table class= "table table-striped">
+    <thead>
+        <tr>
+            <td>Plates</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let car of cars">
+            <td>{{car.plate}}</td>
+            <td><button (click)="view(ver,car)">View</button></td>
+            <td><button (click)="delete (car.id )">Delete</button></td>
+        </tr>
+</table>
+<form [formGroup]="carForm">
+    <table>
+        <input formControlName="plate" placeholder="Plate">
+        <button (click)="add()" class="addCar">Add</button>
+    </table>
+
+</form>
+<ng-template #ver let-modal>
+    <div>
+        <h2>Modificar AUTO</h2>
+        <button  (click)="modal.dismiss()">X</button>
+    </div>
+    <div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <input formControlName = "inputPlate" type="text" placeholder="Plate" >
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <button (click)="modal.close()">Guardar</button>
+    </div>
+</ng-template>
