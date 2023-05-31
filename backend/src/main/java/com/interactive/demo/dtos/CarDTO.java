@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class CarDTO {
     private Integer id;
     private String plate;
+    private Integer driverId;
 }

@@ -6,25 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Driver {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String name;
+    @Column(name = "last_name")
+    private String lastName;
 
-    @ManyToOne
-    @JoinColumn(name = "car_id")
+    @OneToOne(mappedBy = "driver")
     private Car car;
-
-    /*
-    Configuracion para relacion de muchos a muchos
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable( name = "driver", JoinColumn(name = "id_b"), InverseJoinColumns = @JoinColumn(name = "id_a"))
-    private List<Auto> autoList;
-     */
 }

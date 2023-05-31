@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverDTO {
+public class DriverCarDTO {
     private Integer id;
     private String name;
     private String lastName;
+    private CarDriverDTO car;
 }

@@ -1,6 +1,6 @@
 package com.interactive.demo.services;
 
-
+import com.interactive.demo.dtos.DriverCarDTO;
 import com.interactive.demo.dtos.DriverDTO;
 import com.interactive.demo.exception.ApiRequestException;
 import com.interactive.demo.model.Driver;
@@ -28,9 +28,19 @@ public class DriverService {
 
     public ResponseEntity<DriverDTO> add(DriverDTO driverDTO) {
         Driver driver = this.modelMapper.map(driverDTO, Driver.class);
-        Driver createdDriver = driverRepository.save(driver);
+        Driver createdDriver = this.driverRepository.save(driver);
 
         return ResponseEntity.status(CREATED).body(this.modelMapper.map(createdDriver, DriverDTO.class));
+    }
+
+    public ResponseEntity<List<DriverCarDTO>> getDriversWithCar() {
+        List<DriverCarDTO> driverCarDTOS = new ArrayList<>();
+
+        for (Driver driver : this.driverRepository.findAll()) {
+            driverCarDTOS.add(this.modelMapper.map(driver, DriverCarDTO.class));
+        }
+
+        return ResponseEntity.ok(driverCarDTOS);
     }
 
     public ResponseEntity<List<DriverDTO>> getAll() {
