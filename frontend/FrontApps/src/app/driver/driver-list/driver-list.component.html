@@ -1,0 +1,54 @@
+<h1 class="h1 text-center text-white">Lista de pilotos</h1>
+<button class="btn btn-success" (click)="open(content)">
+  <img src="assets/add.svg" alt="Add icon">
+</button>
+<table class="table table-striped mt-4">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Apellido</th>
+      <th scope="col">Patente</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let driver of drivers">
+      <th scope="row">{{driver.id}}</th>
+      <td>{{driver.name}}</td>
+      <td>{{driver.lastName}}</td>
+      <td>{{driver.car.plate}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Añadir piloto</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="driverForm">
+      <div class="mb-3">
+        <label for="name">Nombre</label>
+        <div class="input-group">
+          <input formControlName="name" id="name" class="form-control" placeholder="Charles" name="name" />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="lastName">Apellido</label>
+        <div class="input-group">
+          <input formControlName="lastName" id="lastName" class="form-control" placeholder="Leclerc" name="lastName" />
+        </div>
+      </div>
+      <div class="mb-3 input-group">
+        <label for="car" class="input-group-text">Auto</label>
+        <select class="form-select" formControlName="car" name="car" id="car">
+          <option value="1">Ferrari 488</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Añadir</button>
+  </div>
+</ng-template>
