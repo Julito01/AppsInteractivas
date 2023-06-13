@@ -14,4 +14,8 @@ export class DriverService {
   public async getDrivers(): Promise<Driver[]> {
     return await firstValueFrom(this.httpClient.get<Driver[]>(`${environment.apiUrl}/drivers/cars`))
   }
+
+  public async addDriver(driver: Driver): Promise<Driver> {
+    return await firstValueFrom(this.httpClient.post<Driver>(`${environment.apiUrl}/drivers`, driver))
+  }
 }

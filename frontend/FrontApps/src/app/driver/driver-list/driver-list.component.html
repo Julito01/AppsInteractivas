@@ -1,3 +1,11 @@
+<ngb-toast *ngIf="driverCreated" class="bg-success text-light position-absolute">
+  Piloto añadido correctamente.
+</ngb-toast>
+
+<ngb-toast *ngIf="errorMessage" class="bg-danger text-light position-absolute">
+  {{errorMessage}}
+</ngb-toast>
+
 <h1 class="h1 text-center text-white">Lista de pilotos</h1>
 <button class="btn btn-success" (click)="open(content)">
   <img src="assets/add.svg" alt="Add icon">
@@ -16,7 +24,7 @@
       <th scope="row">{{driver.id}}</th>
       <td>{{driver.name}}</td>
       <td>{{driver.lastName}}</td>
-      <td>{{driver.car.plate}}</td>
+      <td>{{driver.car?.plate}}</td>
     </tr>
   </tbody>
 </table>
@@ -31,24 +39,38 @@
       <div class="mb-3">
         <label for="name">Nombre</label>
         <div class="input-group">
-          <input formControlName="name" id="name" class="form-control" placeholder="Charles" name="name" />
+          <input formControlName="name" id="name" class="form-control" placeholder="Charles" name="name"
+            [class.is-invalid]="controlValidities['name']" (blur)="checkInputValidation('name')" required />
+          <span class="invalid-feedback" *ngIf="controlValidities['name']">
+            El nombre del piloto es requerido.
+          </span>
         </div>
       </div>
       <div class="mb-3">
         <label for="lastName">Apellido</label>
-        <div class="input-group">
-          <input formControlName="lastName" id="lastName" class="form-control" placeholder="Leclerc" name="lastName" />
+        <div class="input-group has-validation">
+          <input formControlName="lastName" id="lastName" class="form-control" placeholder="Leclerc" name="lastName"
+            [class.is-invalid]="controlValidities['lastName']" (blur)="checkInputValidation('lastName')" required />
+          <span class="invalid-feedback" *ngIf="controlValidities['lastName']">
+            El apellido del piloto es requerido.
+          </span>
         </div>
       </div>
-      <div class="mb-3 input-group">
+      <div class="mb-3 input-group has-validation">
         <label for="car" class="input-group-text">Auto</label>
-        <select class="form-select" formControlName="car" name="car" id="car">
-          <option value="1">Ferrari 488</option>
+        <select class="form-select" formControlName="car" name="car" id="car"
+          [class.is-invalid]="controlValidities['car']" (blur)="checkInputValidation('car')" required>
+          <option value="" disabled selected>Seleccione un auto</option>
+          <option *ngFor="let car of cars" [ngValue]="car.id">{{car.plate}}</option>
         </select>
+        <span class="invalid-feedback" *ngIf="controlValidities['car']">
+          El coche para el piloto es requerido.
+        </span>
       </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Añadir</button>
+    <button type="submit" class="btn btn-outline-dark" (click)="modal.close()"
+      [disabled]="driverForm.invalid">Añadir</button>
   </div>
 </ng-template>
