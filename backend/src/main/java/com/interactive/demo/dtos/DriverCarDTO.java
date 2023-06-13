@@ -11,5 +11,5 @@ public class DriverCarDTO {
     private Integer id;
     private String name;
     private String lastName;
-    private CarDriverDTO car;
+    private CarDTO car;
 }

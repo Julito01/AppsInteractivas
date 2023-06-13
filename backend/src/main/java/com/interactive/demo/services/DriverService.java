@@ -3,7 +3,9 @@ package com.interactive.demo.services;
 import com.interactive.demo.dtos.DriverCarDTO;
 import com.interactive.demo.dtos.DriverDTO;
 import com.interactive.demo.exception.ApiRequestException;
+import com.interactive.demo.model.Car;
 import com.interactive.demo.model.Driver;
+import com.interactive.demo.repository.CarRepository;
 import com.interactive.demo.repository.DriverRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +21,53 @@ import static org.springframework.http.HttpStatus.*;
 @Service
 public class DriverService {
     private final DriverRepository driverRepository;
+    private final CarRepository carRepository;
     private final ModelMapper modelMapper;
 
-    public DriverService(DriverRepository repository, ModelMapper modelMapper) {
-        this.driverRepository = repository;
+    public DriverService(DriverRepository driverRepository, CarRepository carRepository, ModelMapper modelMapper) {
+        this.driverRepository = driverRepository;
+        this.carRepository = carRepository;
         this.modelMapper = modelMapper;
     }
 
     public ResponseEntity<DriverDTO> add(DriverDTO driverDTO) {
-        Driver driver = this.modelMapper.map(driverDTO, Driver.class);
-        Driver createdDriver = this.driverRepository.save(driver);
+        Driver driverFound = this.driverRepository.getByFullName(driverDTO.getName(), driverDTO.getLastName());
 
-        return ResponseEntity.status(CREATED).body(this.modelMapper.map(createdDriver, DriverDTO.class));
+                if (driverFound != null)
+                    throw new ApiRequestException(
+                            "Ese piloto ya existe!",
+                            CONFLICT
+                    );
+
+        Car car = this.carRepository.findById(driverDTO.getCarId()).orElseThrow(
+                () -> new ApiRequestException(
+                        String.format("No se encontró el auto con id %s", driverDTO.getCarId()),
+                        NOT_FOUND
+                )
+        );
+
+        Driver driver = new Driver(
+                driverDTO.getName(),
+                driverDTO.getLastName(),
+                car
+        );
+
+        Driver savedDriver = this.driverRepository.save(driver);
+
+        car.getDrivers().add(savedDriver);
+        this.carRepository.save(car);
+
+        return ResponseEntity.status(CREATED).body(this.modelMapper.map(savedDriver, DriverDTO.class));
     }
 
     public ResponseEntity<List<DriverCarDTO>> getDriversWithCar() {
         List<DriverCarDTO> driverCarDTOS = new ArrayList<>();
 
         for (Driver driver : this.driverRepository.findAll()) {
-            driverCarDTOS.add(this.modelMapper.map(driver, DriverCarDTO.class));
+            DriverCarDTO driverCarDTO = this.modelMapper.map(driver, DriverCarDTO.class);
+
+            if (driverCarDTO.getCar() != null)
+                driverCarDTOS.add(driverCarDTO);
         }
 
         return ResponseEntity.ok(driverCarDTOS);

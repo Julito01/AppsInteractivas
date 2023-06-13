@@ -11,4 +11,5 @@ public class DriverDTO {
     private Integer id;
     private String name;
     private String lastName;
+    private Integer carId;
 }

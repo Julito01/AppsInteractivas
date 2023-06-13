@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,7 +17,6 @@ public class Car {
     private Integer id;
     private String plate;
 
-    @OneToOne
-    @JoinColumn(name = "driver_id", referencedColumnName = "id")
-    private Driver driver;
+    @OneToMany(mappedBy = "car")
+    private List<Driver> drivers;
 }

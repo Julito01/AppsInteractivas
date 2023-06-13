@@ -20,6 +20,13 @@ public class Driver {
     @Column(name = "last_name")
     private String lastName;
 
-    @OneToOne(mappedBy = "driver")
+    @ManyToOne
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
+
+    public Driver(String name, String lastName, Car car) {
+        this.name = name;
+        this.lastName = lastName;
+        this.car = car;
+    }
 }
