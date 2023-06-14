@@ -2,6 +2,14 @@
   Piloto añadido correctamente.
 </ngb-toast>
 
+<ngb-toast *ngIf="driverEdited" class="bg-success text-light position-absolute">
+  Piloto editado correctamente.
+</ngb-toast>
+
+<ngb-toast *ngIf="jsonResponse.message" class="bg-success text-light position-absolute">
+  {{jsonResponse.message}}
+</ngb-toast>
+
 <ngb-toast *ngIf="errorMessage" class="bg-danger text-light position-absolute">
   {{errorMessage}}
 </ngb-toast>
@@ -16,7 +24,7 @@
       <th scope="col">#</th>
       <th scope="col">Nombre</th>
       <th scope="col">Apellido</th>
-      <th scope="col">Patente</th>
+      <th scope="col" colspan="3">Patente</th>
     </tr>
   </thead>
   <tbody>
@@ -24,14 +32,24 @@
       <th scope="row">{{driver.id}}</th>
       <td>{{driver.name}}</td>
       <td>{{driver.lastName}}</td>
-      <td>{{driver.car?.plate}}</td>
+      <td>{{driver.car.plate}}</td>
+      <td>
+        <button class="btn" (click)="openEditModal(content, driver.id)">
+          <img src="assets/edit.svg" alt="Edit Icon" />
+        </button>
+      </td>
+      <td>
+        <button class="btn" (click)="deleteDriver(driver.id)">
+          <img src="assets/delete.svg" alt="Delete Icon" />
+        </button>
+      </td>
     </tr>
   </tbody>
 </table>
 
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Añadir piloto</h4>
+    <h4 class="modal-title" id="modal-basic-title">{{isEdit ? 'Editar piloto' : 'Añadir piloto'}}</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
@@ -40,8 +58,8 @@
         <label for="name">Nombre</label>
         <div class="input-group">
           <input formControlName="name" id="name" class="form-control" placeholder="Charles" name="name"
-            [class.is-invalid]="controlValidities['name']" (blur)="checkInputValidation('name')" required />
-          <span class="invalid-feedback" *ngIf="controlValidities['name']">
+            [class.is-invalid]="controlValidities['name'] && !isEdit" (blur)="checkInputValidation('name')" required />
+          <span class="invalid-feedback" *ngIf="controlValidities['name'] && !isEdit">
             El nombre del piloto es requerido.
           </span>
         </div>
@@ -50,8 +68,9 @@
         <label for="lastName">Apellido</label>
         <div class="input-group has-validation">
           <input formControlName="lastName" id="lastName" class="form-control" placeholder="Leclerc" name="lastName"
-            [class.is-invalid]="controlValidities['lastName']" (blur)="checkInputValidation('lastName')" required />
-          <span class="invalid-feedback" *ngIf="controlValidities['lastName']">
+            [class.is-invalid]="controlValidities['lastName'] && !isEdit" (blur)="checkInputValidation('lastName')"
+            required />
+          <span class="invalid-feedback" *ngIf="controlValidities['lastName'] && !isEdit">
             El apellido del piloto es requerido.
           </span>
         </div>
@@ -59,18 +78,19 @@
       <div class="mb-3 input-group has-validation">
         <label for="car" class="input-group-text">Auto</label>
         <select class="form-select" formControlName="car" name="car" id="car"
-          [class.is-invalid]="controlValidities['car']" (blur)="checkInputValidation('car')" required>
+          [class.is-invalid]="controlValidities['car'] && !isEdit" (blur)="checkInputValidation('car')" required>
           <option value="" disabled selected>Seleccione un auto</option>
           <option *ngFor="let car of cars" [ngValue]="car.id">{{car.plate}}</option>
         </select>
-        <span class="invalid-feedback" *ngIf="controlValidities['car']">
+        <span class="invalid-feedback" *ngIf="controlValidities['car'] && !isEdit">
           El coche para el piloto es requerido.
         </span>
       </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-outline-dark" (click)="modal.close()"
-      [disabled]="driverForm.invalid">Añadir</button>
+    <button type="submit" class="btn btn-outline-dark" (click)="modal.close()" [disabled]="driverForm.invalid">
+      {{isEdit ? 'Editar' : 'Añadir'}}
+    </button>
   </div>
 </ng-template>
