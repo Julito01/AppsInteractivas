@@ -91,7 +91,17 @@ public class DriverService {
                                 NOT_FOUND
                         ));
 
+        Car car = carRepository.findById(driverDTO.getCarId()).orElseThrow(
+                () -> new ApiRequestException(
+                        String.format("Auto con id [%s] no encontrado", driverDTO.getCarId()),
+                        NOT_FOUND
+                )
+        );
+
         driver.setName(driverDTO.getName());
+        driver.setLastName(driverDTO.getLastName());
+        driver.setCar(car);
+
         Driver updatedDriver = driverRepository.save(driver);
 
         return ResponseEntity.ok(this.modelMapper.map(updatedDriver, DriverDTO.class));
@@ -110,7 +120,7 @@ public class DriverService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("result", true);
-        response.put("message", "Piloto con id [%s] eliminado");
+        response.put("message", String.format("Piloto con id [%s] eliminado", driverId));
 
         return ResponseEntity.ok(response);
     }
